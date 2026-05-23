@@ -14,6 +14,8 @@ bool testBit(Bitboard bb, int sq) {
 // Print the bitboard in a chess board format
 void printBitboard(Bitboard bb) {
     for (int rank = 7; rank > -1; rank--) {
+        // Print rank numbers
+        std::cout << rank + 1 << ' ' << ' ';
         for (int file = 0; file < 8; file++) {
             int squareIndex = rank * 8 + file;
             if (testBit(bb, squareIndex)) {
@@ -24,4 +26,12 @@ void printBitboard(Bitboard bb) {
         }
         std::cout << '\n';
     }
+
+    //Print file letters
+    std::cout << "   "; 
+    for (int file = 0; file < 8; file++) {
+        std::cout << (char)('a' + file) << ' ';
+    }
+    
+    std::cout << '\n';
 }
