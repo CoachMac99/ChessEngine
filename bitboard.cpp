@@ -1,9 +1,16 @@
 #include "bitboard.h"
 #include <iostream>
+#include <sstream>
+#include <vector>
+using namespace std;
 
 // Create a bitboard with a single bit set at square sq (0–63)
-Bitboard squareBB(int sq) {
-    return 1ULL << sq;
+Bitboard squareBB(string sq) {
+    // Convert file to equivalent number
+    int file = sq[0] - 'a';
+    int rank = sq[1] - '1';
+    
+    return 1ULL << rank * 8 + file;
 }
 
 // Check if the bit at square sq is set
@@ -15,23 +22,22 @@ bool testBit(Bitboard bb, int sq) {
 void printBitboard(Bitboard bb) {
     for (int rank = 7; rank > -1; rank--) {
         // Print rank numbers
-        std::cout << rank + 1 << ' ' << ' ';
+        cout << rank + 1 << ' ' << ' ';
         for (int file = 0; file < 8; file++) {
             int squareIndex = rank * 8 + file;
             if (testBit(bb, squareIndex)) {
-                std::cout << 1 << ' ';
+                cout << 1 << ' ';
             } else {
-                std::cout << 0 << ' ';
+                cout << 0 << ' ';
             }
         }
-        std::cout << '\n';
+        cout << '\n';
     }
 
     //Print file letters
-    std::cout << "   "; 
+    cout << "   "; 
     for (int file = 0; file < 8; file++) {
-        std::cout << (char)('a' + file) << ' ';
+        cout << (char)('a' + file) << ' ';
     }
-    
-    std::cout << '\n';
+
 }
