@@ -8,6 +8,9 @@ int main() {
     Bitboard bb = squareBB("a1");
     setBit(bb, 63);
     setBit(bb, 40);
-    printBitboard(bb); 
+    printBitboard(bb);
+    clearBit(bb, 0);
+    
+    printBitboard(bb);
     return 0;
 }

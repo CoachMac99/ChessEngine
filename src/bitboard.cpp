@@ -13,8 +13,14 @@ Bitboard squareBB(string sq) {
     return 1ULL << (rank * 8 + file);
 }
 
+// Set the bit at sq (0-63)
 void setBit(Bitboard& bb, int sq) {
     bb |= (1ULL << sq);
+}
+
+// Clear the bit at sq (0-63)
+void clearBit(Bitboard& bb, int sq) {
+    bb &= ~(1ULL << sq);
 }
 
 // Check if the bit at square sq is set
