@@ -1,16 +1,11 @@
 #include <iostream>
-#include "bitboard.h"
-using Bitboard = uint64_t;
+#include "board/bitboard.h"
+#include "moveGeneration/movegen.h"
 
 int visualizationMain();  // forward declare
 
 int main() {
-    Bitboard bb = squareBB("a1");
-    setBit(bb, 63);
-    setBit(bb, 40);
-    printBitboard(bb);
-    clearBit(bb, 0);
-    
-    printBitboard(bb);
+    initAttackTables();
+    printBitboard(knightAttacks[36]);
     return 0;
 }

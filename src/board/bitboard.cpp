@@ -59,6 +59,7 @@ void printBitboard(Bitboard bb) {
     for (int rank = 7; rank > -1; rank--) {
         // Print rank numbers
         cout << rank + 1 << ' ' << ' ';
+        
         for (int file = 0; file < 8; file++) {
             int squareIndex = rank * 8 + file;
             if (testBit(bb, squareIndex)) {

@@ -3,6 +3,8 @@
 
 using Bitboard = uint64_t;
 
+// For this chess engine we chose to go with bitboards for our data structure.
+
 // Create a bitboard with a single bit set at square sq (a1 - h8)
 Bitboard squareBB(std::string sq);
 
