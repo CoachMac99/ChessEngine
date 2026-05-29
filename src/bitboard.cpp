@@ -10,7 +10,7 @@ Bitboard squareBB(string sq) {
     int file = sq[0] - 'a';
     int rank = sq[1] - '1';
     
-    return 1ULL << rank * 8 + file;
+    return 1ULL << (rank * 8 + file);
 }
 
 void setBit(Bitboard& bb, int sq) {
