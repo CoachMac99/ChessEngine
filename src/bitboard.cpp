@@ -40,12 +40,18 @@ int lsbIndex(Bitboard bb) {
 
 // Clear the lowest set bit (for iterating)
 void popLsb(Bitboard& bb) {
-    bb & (bb - 1);
+    bb &= (bb - 1);
 }
 
 // Count the number of set bits
 int popcount(Bitboard bb) {
-    return 0;
+    int count = 0;
+
+    while (bb) {
+        popLsb(bb);
+        count++;
+    }
+    return count;
 }
 
 // Print the bitboard in a chess board format
