@@ -28,6 +28,26 @@ bool testBit(Bitboard bb, int sq) {
     return (bb & (1ULL << sq)) != 0;
 }
 
+// Isolate the lowest set bit
+Bitboard lsb(Bitboard bb) {
+    return bb & -bb;
+}
+
+// Get the square index of the lowest set bit (returns 0–63)
+int lsbIndex(Bitboard bb) {
+    return __builtin_ctzll(bb);
+}
+
+// Clear the lowest set bit (for iterating)
+void popLsb(Bitboard& bb) {
+    bb & (bb - 1);
+}
+
+// Count the number of set bits
+int popcount(Bitboard bb) {
+    return 0;
+}
+
 // Print the bitboard in a chess board format
 void printBitboard(Bitboard bb) {
     for (int rank = 7; rank > -1; rank--) {

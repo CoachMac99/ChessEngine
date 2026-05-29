@@ -1,4 +1,6 @@
 ## TODO
-1. Implement leaping pieces for bitboard
-2. Implement sliding pieces for bitboard
-3. Implement PERFT for testing
+- [] Implement popCount
+- [] Implement leaping pieces for bitboard
+- [] Implement sliding pieces for bitboard
+- [] Implement PERFT for testing
+ 
