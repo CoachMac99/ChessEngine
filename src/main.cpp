@@ -5,7 +5,9 @@ using Bitboard = uint64_t;
 int visualizationMain();  // forward declare
 
 int main() {
-    Bitboard bb = squareBB("h8");
-    printBitboard(bb); // should show white pawns on rank 2
-    return visualizationMain();
+    Bitboard bb = squareBB("a1");
+    setBit(bb, 63);
+    setBit(bb, 40);
+    printBitboard(bb); 
+    return 0;
 }

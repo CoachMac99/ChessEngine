@@ -4,13 +4,17 @@
 #include <vector>
 using namespace std;
 
-// Create a bitboard with a single bit set at square sq (0–63)
+// Create a bitboard with a single bit set at square sq (a1–h8)
 Bitboard squareBB(string sq) {
     // Convert file to equivalent number
     int file = sq[0] - 'a';
     int rank = sq[1] - '1';
     
     return 1ULL << rank * 8 + file;
+}
+
+void setBit(Bitboard& bb, int sq) {
+    bb |= (1ULL << sq);
 }
 
 // Check if the bit at square sq is set
