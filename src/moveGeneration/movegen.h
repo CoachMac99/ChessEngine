@@ -12,8 +12,10 @@ extern Bitboard knightAttacks[64];
 // King attack table
 extern Bitboard kingAttacks[64];
 
-// Pawn attack table
-extern Bitboard pawnAttacks[64];
+// Pawn attack tables
+extern Bitboard whitePawnAttacks[64];
+extern Bitboard blackPawnAttacks[64];
+
 
 // Compute all attack tables
 void initAttackTables();
@@ -25,4 +27,4 @@ Bitboard computeKnightAttacks(int sq);
 Bitboard computeKingAttacks(int sq);
 
 // Compute the possible pawn attacks from square sq (0-63)
-Bitboard computePawnAttacks(int sq);
+Bitboard computePawnAttacks(int sq, int color);

@@ -4,15 +4,16 @@
 // Initialize arrays
 Bitboard knightAttacks[64];
 Bitboard kingAttacks[64];
-Bitboard pawnAttacks[64];
-
+Bitboard whitePawnAttacks[64];
+Bitboard blackPawnAttacks[64];
 // Compute all attack tables
 void initAttackTables() {
 
     for (int sq = 0; sq < 64; sq++) {
         knightAttacks[sq] = computeKnightAttacks(sq);
         kingAttacks[sq] = computeKingAttacks(sq);
-        // pawnAttacks[sq] = computePawnAttacks(sq);
+        whitePawnAttacks[sq] = computePawnAttacks(sq, 0);
+        blackPawnAttacks[sq] = computePawnAttacks(sq, 1);
     }
 
 }
@@ -69,4 +70,23 @@ Bitboard computeKingAttacks(int sq) {
 }
 
 // Compute the possible pawn attacks from square sq (0-63)
-Bitboard computePawnAttacks(int sq);
+Bitboard computePawnAttacks(int sq, int color) {
+    Bitboard attacks = 0ULL;
+    Bitboard pawn = 1ULL << sq;
+
+    //White
+    if (color == 0) {
+        // Left attack
+        attacks |= (pawn & NOT_A_FILE) << 7;
+        // Right attack
+        attacks |= (pawn & NOT_H_FILE) << 9;
+    } 
+    else { //Black
+        // Left attack
+        attacks |= (pawn & NOT_H_FILE) >> 7;
+        // Right attack
+        attacks |= (pawn & NOT_A_FILE) >> 9;
+    }
+
+    return attacks;
+}

@@ -1,9 +1,9 @@
 ## TODO
 - [x] Implement popCount
-- [] Implement leaping pieces for bitboard
+- [x] Implement leaping pieces for bitboard
     - [x] Knight
-    - [] King
-    - [] Pawn
+    - [x] King
+    - [x] Pawn
 - [] Implement sliding pieces for bitboard
     - [] Rook
     - [] Bishop

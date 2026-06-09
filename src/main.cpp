@@ -6,7 +6,7 @@ int visualizationMain();  // forward declare
 
 int main() {
     initAttackTables();
-    printBitboard(kingAttacks[63]);
+    printBitboard(whitePawnAttacks[20]);
 
     return 0;
 }
