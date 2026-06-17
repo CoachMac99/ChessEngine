@@ -28,3 +28,6 @@ Bitboard computeKingAttacks(int sq);
 
 // Compute the possible pawn attacks from square sq (0-63)
 Bitboard computePawnAttacks(int sq, int color);
+
+Bitboard rookRelevantBlockers(int sq);
+Bitboard bishopRelevantBlockers(int sq);

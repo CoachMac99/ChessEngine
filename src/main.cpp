@@ -5,10 +5,10 @@
 int visualizationMain();  // forward declare
 
 int main() {
-    //initAttackTables();
-    //printBitboard(whitePawnAttacks[20]);
+    initAttackTables();
+    printBitboard(rookRelevantBlockers(28));
 
-    visualizationMain();
+    // visualizationMain();
 
     return 0;
 }

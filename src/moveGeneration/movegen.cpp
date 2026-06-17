@@ -90,3 +90,35 @@ Bitboard computePawnAttacks(int sq, int color) {
 
     return attacks;
 }
+
+Bitboard rookRelevantBlockers(int sq) {
+    Bitboard mask = 0ULL;
+    int rank = sq / 8;
+    int file = sq % 8;
+
+    // walk up the file, from rank+1 to rank 6 (not rank 7)
+    for (int r = rank + 1; r <= 6; r++) {
+        // set bit at (r, file)
+        setBit(mask, r * 8 + file);
+    }
+
+    // walk down the file, from rank-1 to rank 1 (not rank 0)
+    for (int r = rank - 1; r >= 1; r--) {
+        // set bit at (r, file)
+        setBit(mask, r * 8 + file);
+    }
+    
+    // walk right along the rank, from file+1 to file 6 (not file 7)
+    for (int f = file + 1; f <= 6; f++) {
+        // set bit at (r, file)
+        setBit(mask, rank * 8 + f);
+    }
+
+    // walk left along the rank, from file-1 to file 1 (not file 0)
+    for (int f = file - 1; f >= 1; f--) {
+        // set bit at (r, file)
+        setBit(mask, rank * 8 + f);
+    }
+
+    return mask;
+}
