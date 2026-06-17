@@ -34,6 +34,20 @@ int visualizationMain() {
     glfwMakeContextCurrent(window);
     gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
 
+    // Registers a callback whenever the window is resized to avoid it looked off
+    glfwSetFramebufferSizeCallback(window, [](GLFWwindow*, int width, int height) {
+    int size = std::min(width, height);
+    int x = (width - size) / 2;
+    int y = (height - size) / 2;
+    glViewport(x, y, size, size);
+    });
+
+    // force it to run once for the initial window size
+    int width, height;
+    glfwGetFramebufferSize(window, &width, &height);
+    int size = std::min(width, height);
+    glViewport((width - size) / 2, (height - size) / 2, size, size);
+
     //compiling shaders
     // 1. Create a shader object
     unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
