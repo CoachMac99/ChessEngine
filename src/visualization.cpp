@@ -76,6 +76,44 @@ int visualizationMain() {
     int size = std::min(width, height);
     glViewport((width - size) / 2, (height - size) / 2, size, size);
 
+    // create a small struct to hold the selection state
+    struct BoardState {
+        int selectedCol = -1;
+        int selectedRow = -1;
+    };
+
+    BoardState state;
+
+    // store it on the window so the callback can access it
+    glfwSetWindowUserPointer(window, &state);
+
+
+    //Mouse action
+    glfwSetMouseButtonCallback(window, [](GLFWwindow* win, int button, int action, int mods) {
+        if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
+            BoardState* state = (BoardState*)glfwGetWindowUserPointer(win);
+
+            double mouseX, mouseY;
+            glfwGetCursorPos(win, &mouseX, &mouseY);
+
+            int winWidth, winHeight;
+            glfwGetWindowSize(win, &winWidth, &winHeight);
+
+            int size = std::min(winWidth, winHeight);
+            int offsetX = (winWidth - size) / 2;
+            int offsetY = (winHeight - size) / 2;
+
+            double boardX = mouseX - offsetX;
+            double boardY = mouseY - offsetY;
+
+            if (boardX < 0 || boardX > size || boardY < 0 || boardY > size) return;
+
+            state->selectedCol = (int)(boardX / size * 8);
+            state->selectedRow = 7 - (int)(boardY / size * 8);
+        }
+     }
+);
+
     //compiling shaders
     // 1. Create a shader object
     unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
@@ -162,82 +200,6 @@ int visualizationMain() {
     };
 
 
-    for (int row = 0; row < 8; row++) {
-        for (int col = 0; col < 8; col++) {
-            float x = -1.0f + col * squareSize;
-            float y = -1.0f + row * squareSize;
-
-            float r, g, b;
-            if ((col + row) % 2 == 0) {
-                r = 0.9f; g = 0.9f; b = 0.8f; // light squares
-            } else {
-                r = 0.2f; g = 0.2f; b = 0.2f; // dark squares
-            }
-
-            //Flag = 0 empty square, Flag = 1 draw circle, Col = 0 white, Col = 1 black
-            float pieceFlag = (board[row][col] != 0) ? 1.0f : 0.0f;
-            float pieceCol  = (board[row][col] == 2) ? 1.0f : 0.0f;
-
-            int base = vertexOffset; //Where we are before writing the square's vertices
-
-            // 4 corners of this square, each with position (x,y) + color (rgb). vertexOffset++ just increments so they are placed in the next one
-            // bottom left
-            vertices[vertexOffset++] = x;
-            vertices[vertexOffset++] = y;
-            vertices[vertexOffset++] = r;
-            vertices[vertexOffset++] = g;
-            vertices[vertexOffset++] = b;
-            vertices[vertexOffset++] = pieceFlag;
-            vertices[vertexOffset++] = pieceCol;
-            vertices[vertexOffset++] = 0.0f; // u (bottom-left corner of UV)
-            vertices[vertexOffset++] = 0.0f; // v
-
-            // bottom right (the same but now x+squaresize so we move from left to right corner)
-            vertices[vertexOffset++] = x + squareSize;
-            vertices[vertexOffset++] = y;
-            vertices[vertexOffset++] = r;
-            vertices[vertexOffset++] = g;
-            vertices[vertexOffset++] = b;
-            vertices[vertexOffset++] = pieceFlag;
-            vertices[vertexOffset++] = pieceCol;
-            vertices[vertexOffset++] = 1.0f; // u (bottom-left corner of UV)
-            vertices[vertexOffset++] = 0.0f; // v
-
-            // top right (both x and y is increased)
-            vertices[vertexOffset++] = x + squareSize;
-            vertices[vertexOffset++] = y + squareSize;
-            vertices[vertexOffset++] = r;
-            vertices[vertexOffset++] = g;
-            vertices[vertexOffset++] = b;
-            vertices[vertexOffset++] = pieceFlag;
-            vertices[vertexOffset++] = pieceCol;
-            vertices[vertexOffset++] = 1.0f; // u (bottom-left corner of UV)
-            vertices[vertexOffset++] = 1.0f; // v
-
-            // top left
-            vertices[vertexOffset++] = x;
-            vertices[vertexOffset++] = y + squareSize;
-            vertices[vertexOffset++] = r;
-            vertices[vertexOffset++] = g;
-            vertices[vertexOffset++] = b;
-            vertices[vertexOffset++] = pieceFlag;
-            vertices[vertexOffset++] = pieceCol;
-            vertices[vertexOffset++] = 0.0f; // u (bottom-left corner of UV)
-            vertices[vertexOffset++] = 1.0f; // v
-
-            // 2 triangles using the 4 corners above
-            // base is where this square's vertices start in the array, but each vertex is 9 floats so divide by 9 to convert. Then + the corners of the square
-            // triangle 1
-            indices[indexOffset++] = base / 9 + 0;
-            indices[indexOffset++] = base / 9 + 1;
-            indices[indexOffset++] = base / 9 + 2;
-            // triangle 2
-            indices[indexOffset++] = base / 9 + 2;
-            indices[indexOffset++] = base / 9 + 3;
-            indices[indexOffset++] = base / 9 + 0;
-        }
-    }
-
     //VAO - Vertex Array Object. Remembers setup/configuration. Create and bind VAO first
     unsigned int VAO;
     glGenVertexArrays(1, &VAO);
@@ -253,8 +215,6 @@ int visualizationMain() {
     //Create the EBO and upload index data
     unsigned int EBO;
     glGenBuffers(1, &EBO);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
     // 4. Tell OpenGL how to read the vertex data
     // position — location 0, 2 floats, offset 0
@@ -278,17 +238,104 @@ int visualizationMain() {
     glEnableVertexAttribArray(4);
 
 
+    // build indices once — they never change
+    for (int i = 0; i < 64; i++) {
+        int base = i * 4; // 4 vertices per square
+        indices[i * 6 + 0] = base + 0;
+        indices[i * 6 + 1] = base + 1;
+        indices[i * 6 + 2] = base + 2;
+        indices[i * 6 + 3] = base + 2;
+        indices[i * 6 + 4] = base + 3;
+        indices[i * 6 + 5] = base + 0;
+    }
+
+    // upload EBO once
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
+
     //Open Window
     while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();   // process keyboard/mouse/window events
+
+        // rebuild vertex data every frame
+        vertexOffset = 0;
+
+        for (int row = 0; row < 8; row++) {
+            for (int col = 0; col < 8; col++) {
+                float x = -1.0f + col * squareSize;
+                float y = -1.0f + row * squareSize;
+
+                float r, g, b;
+                if (col == state.selectedCol && row == state.selectedRow) {
+                    r = 0.9f; g = 0.7f; b = 0.2f; // highlight color — yellow
+                } else if ((col + row) % 2 == 0) {
+                    r = 0.9f; g = 0.9f; b = 0.8f; // light square
+                } else {
+                    r = 0.2f; g = 0.2f; b = 0.2f; // dark square
+                }
+
+                //Flag = 0 empty square, Flag = 1 draw circle, Col = 0 white, Col = 1 black
+                float pieceFlag = (board[row][col] != 0) ? 1.0f : 0.0f;
+                float pieceCol  = (board[row][col] == 2) ? 1.0f : 0.0f;
+
+                // 4 corners of this square, each with position (x,y) + color (rgb). vertexOffset++ just increments so they are placed in the next one
+                // bottom left
+                vertices[vertexOffset++] = x;
+                vertices[vertexOffset++] = y;
+                vertices[vertexOffset++] = r;
+                vertices[vertexOffset++] = g;
+                vertices[vertexOffset++] = b;
+                vertices[vertexOffset++] = pieceFlag;
+                vertices[vertexOffset++] = pieceCol;
+                vertices[vertexOffset++] = 0.0f; // u (bottom-left corner of UV)
+                vertices[vertexOffset++] = 0.0f; // v
+
+                // bottom right (the same but now x+squaresize so we move from left to right corner)
+                vertices[vertexOffset++] = x + squareSize;
+                vertices[vertexOffset++] = y;
+                vertices[vertexOffset++] = r;
+                vertices[vertexOffset++] = g;
+                vertices[vertexOffset++] = b;
+                vertices[vertexOffset++] = pieceFlag;
+                vertices[vertexOffset++] = pieceCol;
+                vertices[vertexOffset++] = 1.0f; // u (bottom-left corner of UV)
+                vertices[vertexOffset++] = 0.0f; // v
+
+                // top right (both x and y is increased)
+                vertices[vertexOffset++] = x + squareSize;
+                vertices[vertexOffset++] = y + squareSize;
+                vertices[vertexOffset++] = r;
+                vertices[vertexOffset++] = g;
+                vertices[vertexOffset++] = b;
+                vertices[vertexOffset++] = pieceFlag;
+                vertices[vertexOffset++] = pieceCol;
+                vertices[vertexOffset++] = 1.0f; // u (bottom-left corner of UV)
+                vertices[vertexOffset++] = 1.0f; // v
+
+                // top left
+                vertices[vertexOffset++] = x;
+                vertices[vertexOffset++] = y + squareSize;
+                vertices[vertexOffset++] = r;
+                vertices[vertexOffset++] = g;
+                vertices[vertexOffset++] = b;
+                vertices[vertexOffset++] = pieceFlag;
+                vertices[vertexOffset++] = pieceCol;
+                vertices[vertexOffset++] = 0.0f; // u (bottom-left corner of UV)
+                vertices[vertexOffset++] = 1.0f; // v
+            }
+        }
+
+        // re-upload the updated vertex data
+        glBindBuffer(GL_ARRAY_BUFFER, VBO);
+        glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
+
         glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
-
         glBindVertexArray(VAO);
         glDrawElements(GL_TRIANGLES, 64 * 6, GL_UNSIGNED_INT, 0); //draw triangles using 64 * 6 indices that are unsigned ints, starting at index 0
 
         glfwSwapBuffers(window);  // show the rendered frame
-
         
     }
 

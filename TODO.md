@@ -8,5 +8,34 @@
     - [] Rook
     - [] Bishop
     - [] Queen
+- [] Position bitboards
+- [] Implement isLegalMove(from, to)
+- [] Implement applyMove(from, to)
+    - [] Handle captures
+    - [] Handle special moves (castling, en passant, promotion)
 - [] Implement PERFT for testing
  
+
+ ### Visualization
+- [x] Make OpenGL work
+    - [x] Create OpenGL window with GLFW
+    - [x] Set up OpenGL context with GLAD
+    - [x] Write and compile vertex and fragment shaders
+- [x] Make a chessBoard
+    - [x] Draw a single quad
+    - [x] Draw all 64 squares with alternating colors
+    - [x] Keep board square on window resize (viewport callback)
+    - [x] Render pieces as circles using UV distance trick
+    - [x] Square selection highlighting on mouse click
+- [] Connect piece positions to bitboards
+    - [] Add position bitboards to engine (whitePieces, blackPieces)
+    - [] Replace hardcoded board array with testBit reads
+- [] Two-click move input
+    - [] First click selects a piece
+    - [] Second click selects destination
+- [] Move validation
+    - [] Hook into engine legal move generation
+- [] Apply moves to board state
+    - [] Update bitboards after a move
+    - [] Handle captures
+- [] Highlight legal moves on piece selection (optional)
