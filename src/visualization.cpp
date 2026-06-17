@@ -78,11 +78,51 @@ int visualizationMain() {
 
     glUseProgram(shaderProgram); //Tells GPU which shaders to use
 
+        //VBO - Vertex buffer object. Chunk of memory on the GPU telling where the vertex data is stored. Define 4 corners
+    float vertices[] = {
+    -0.5f, -0.5f,  // bot left 
+     0.5f, -0.5f,  // bot right 
+     0.5f,  0.5f,  // top right   
+    -0.5f,  0.5f   // top left  
+    };
+
+    //EBO - Element Buffer Object. OpenGL draws triangles, this tells which vertices for each triangle
+    unsigned int indices[] = {
+    0, 1, 2,  // (bot-left, bot-right, top-right)
+    2, 3, 0   // (top-right, top-left, bot-left)
+    };
+
+    //VAO - Vertex Array Object. Remembers setup/configuration. Create and bind VAO first
+    unsigned int VAO;
+    glGenVertexArrays(1, &VAO);
+    glBindVertexArray(VAO);
+
+
+    //Create VBO and upload vertex data
+    unsigned int VBO;
+    glGenBuffers(1, &VBO);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+    //Create the EBO and upload index data
+    unsigned int EBO;
+    glGenBuffers(1, &EBO);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
+    // 4. Tell OpenGL how to read the vertex data
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0); //Location 0, 2 values (xy), floats, dont normalize, how many bites to jump (2 float wide), data starts at beginning of buffer
+    glEnableVertexAttribArray(0);
+
     //Open Window
     while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();   // process keyboard/mouse/window events
-        glClearColor(1,0,0,0);
+        glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
+
+        glBindVertexArray(VAO);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0); //draw triangles using 6 indices that are unsigned ints, starting at index 0
+        
         glfwSwapBuffers(window);  // show the rendered frame
 
         
