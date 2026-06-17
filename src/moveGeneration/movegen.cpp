@@ -237,3 +237,11 @@ Bitboard bishopAttacks(int sq, Bitboard blockers) {
     }
     return attacks;
 }
+
+void enumerateSubsets(Bitboard mask) {
+    Bitboard subset = 0ULL;
+    do {
+        // use `subset` here — e.g. call rookAttacksSlow(sq, subset)
+        subset = (subset - mask) & mask;
+    } while (subset != 0ULL);
+}

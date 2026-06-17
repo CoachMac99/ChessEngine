@@ -34,3 +34,5 @@ Bitboard bishopRelevantBlockers(int sq);
 
 Bitboard rookAttacks(int sq, Bitboard blockers);
 Bitboard bishopAttacks(int sq, Bitboard blockers);
+
+void enumerateSubsets(Bitboard mask);
