@@ -51,6 +51,8 @@ Bitboard getRookAttacks(int sq, Bitboard occupancy);
 
 Bitboard getBishopAttacks(int sq, Bitboard occupancy);
 
+Bitboard getQueenAttacks(int sq, Bitboard occupancy);
+
 Bitboard rookRelevantBlockers(int sq);
 Bitboard bishopRelevantBlockers(int sq);
 

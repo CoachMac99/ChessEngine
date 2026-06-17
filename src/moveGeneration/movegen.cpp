@@ -130,6 +130,10 @@ Bitboard getBishopAttacks(int sq, Bitboard occupancy) {
     return bishopTables[sq][index];
 }
 
+Bitboard getQueenAttacks(int sq, Bitboard occupancy) {
+    return getRookAttacks(sq, occupancy) | getBishopAttacks(sq, occupancy);
+}
+
 Bitboard rookRelevantBlockers(int sq) {
     Bitboard mask = 0ULL;
     int rank = sq / 8;
