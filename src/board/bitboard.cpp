@@ -4,13 +4,23 @@
 #include <vector>
 using namespace std;
 
-// Create a bitboard with a single bit set at square sq (0–63)
+// Create a bitboard with a single bit set at square sq (a1–h8)
 Bitboard squareBB(string sq) {
     // Convert file to equivalent number
     int file = sq[0] - 'a';
     int rank = sq[1] - '1';
     
-    return 1ULL << rank * 8 + file;
+    return 1ULL << (rank * 8 + file);
+}
+
+// Set the bit at sq (0-63)
+void setBit(Bitboard& bb, int sq) {
+    bb |= (1ULL << sq);
+}
+
+// Clear the bit at sq (0-63)
+void clearBit(Bitboard& bb, int sq) {
+    bb &= ~(1ULL << sq);
 }
 
 // Check if the bit at square sq is set
@@ -18,11 +28,38 @@ bool testBit(Bitboard bb, int sq) {
     return (bb & (1ULL << sq)) != 0;
 }
 
+// Isolate the lowest set bit
+Bitboard lsb(Bitboard bb) {
+    return bb & -bb;
+}
+
+// Get the square index of the lowest set bit (returns 0–63)
+int lsbIndex(Bitboard bb) {
+    return __builtin_ctzll(bb);
+}
+
+// Clear the lowest set bit (for iterating)
+void popLsb(Bitboard& bb) {
+    bb &= (bb - 1);
+}
+
+// Count the number of set bits
+int popcount(Bitboard bb) {
+    int count = 0;
+
+    while (bb) {
+        popLsb(bb);
+        count++;
+    }
+    return count;
+}
+
 // Print the bitboard in a chess board format
 void printBitboard(Bitboard bb) {
     for (int rank = 7; rank > -1; rank--) {
         // Print rank numbers
         cout << rank + 1 << ' ' << ' ';
+        
         for (int file = 0; file < 8; file++) {
             int squareIndex = rank * 8 + file;
             if (testBit(bb, squareIndex)) {
