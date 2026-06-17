@@ -31,3 +31,6 @@ Bitboard computePawnAttacks(int sq, int color);
 
 Bitboard rookRelevantBlockers(int sq);
 Bitboard bishopRelevantBlockers(int sq);
+
+Bitboard rookAttacksSlow(int sq, Bitboard blockers);
+Bitboard bishopAttacksSlow(int sq, Bitboard blockers)

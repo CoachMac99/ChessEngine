@@ -122,3 +122,32 @@ Bitboard rookRelevantBlockers(int sq) {
 
     return mask;
 }
+
+Bitboard bishopRelevantBlockers(int sq) {
+    Bitboard mask = 0ULL;
+    int rank = sq / 8;
+    int file = sq % 8;
+
+    // up-right diagonal: rank increases, file increases
+    for (int r = rank + 1, f = file + 1; r <= 6 && f <= 6; r++, f++) {
+        setBit(mask, r * 8 + f);
+    }
+
+    // up-left diagonal: rank increases, file decreases
+    for (int r = rank + 1, f = file - 1; r <= 6 && f >= 1; r++, f--) {
+        setBit(mask, r * 8 + f);
+    }
+
+    // down-right diagonal: rank decreases, file increases
+    for (int r = rank - 1, f = file + 1; r >= 1 && f <= 6; r--, f++) {
+        setBit(mask, r * 8 + f);
+    }
+
+    // down-left diagonal: rank decreases, file decreases
+    for (int r = rank - 1, f = file - 1; r >= 1 && f >= 1; r--, f--) {
+        setBit(mask, r * 8 + f);
+    }
+
+    return mask;
+}
+

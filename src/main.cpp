@@ -6,7 +6,7 @@ int visualizationMain();  // forward declare
 
 int main() {
     initAttackTables();
-    printBitboard(rookRelevantBlockers(28));
+    printBitboard(bishopRelevantBlockers(28));
 
     // visualizationMain();
 
