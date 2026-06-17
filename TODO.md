@@ -4,10 +4,10 @@
     - [x] Knight
     - [x] King
     - [x] Pawn
-- [] Implement sliding pieces for bitboard
-    - [] Rook
-    - [] Bishop
-    - [] Queen
+- [x] Implement sliding pieces for bitboard
+    - [x] Rook
+    - [x] Bishop
+    - [x] Queen
 - [] Position bitboards
 - [] Implement isLegalMove(from, to)
 - [] Implement applyMove(from, to)

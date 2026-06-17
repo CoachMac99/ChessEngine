@@ -1,11 +1,18 @@
 #include "../board/bitboard.h"
 #include "movegen.h"
+#include <vector>
+#include <random>
 
 // Initialize arrays
 Bitboard knightAttacks[64];
 Bitboard kingAttacks[64];
 Bitboard whitePawnAttacks[64];
 Bitboard blackPawnAttacks[64];
+MagicEntry rookMagics[64];
+std::vector<Bitboard> rookTables[64];
+MagicEntry bishopMagics[64];
+std::vector<Bitboard> bishopTables[64];
+
 // Compute all attack tables
 void initAttackTables() {
 
@@ -16,6 +23,28 @@ void initAttackTables() {
         blackPawnAttacks[sq] = computePawnAttacks(sq, 1);
     }
 
+}
+
+void initRookMagics() {
+    for (int sq = 0; sq < 64; sq++) {
+        Bitboard mask = rookRelevantBlockers(sq);
+        auto groundTruth = buildGroundTruth(sq, mask, ROOK);
+        int indexBits = popcount(mask);
+
+        rookMagics[sq] = findMagic(sq, mask, groundTruth, indexBits);
+        tryMakeTable(groundTruth, rookMagics[sq], rookTables[sq]); // rebuild final table
+    }
+}
+
+void initBishopMagics() {
+    for (int sq = 0; sq < 64; sq++) {
+        Bitboard mask = bishopRelevantBlockers(sq);
+        auto groundTruth = buildGroundTruth(sq, mask, BISHOP);
+        int indexBits = popcount(mask);
+
+        bishopMagics[sq] = findMagic(sq, mask, groundTruth, indexBits);
+        tryMakeTable(groundTruth, bishopMagics[sq], bishopTables[sq]); // rebuild final table
+    }
 }
 
 // Compute the possible knight attacks from square sq (0-63)
@@ -89,6 +118,16 @@ Bitboard computePawnAttacks(int sq, int color) {
     }
 
     return attacks;
+}
+
+Bitboard getRookAttacks(int sq, Bitboard occupancy) {
+    int index = magicIndex(rookMagics[sq], occupancy);
+    return rookTables[sq][index];
+}
+
+Bitboard getBishopAttacks(int sq, Bitboard occupancy) {
+    int index = magicIndex(bishopMagics[sq], occupancy);
+    return bishopTables[sq][index];
 }
 
 Bitboard rookRelevantBlockers(int sq) {
@@ -238,10 +277,85 @@ Bitboard bishopAttacks(int sq, Bitboard blockers) {
     return attacks;
 }
 
-void enumerateSubsets(Bitboard mask) {
+std::vector<Bitboard> generateOccupancySubsets(Bitboard mask) {
+    std::vector<Bitboard> subsets;
     Bitboard subset = 0ULL;
     do {
-        // use `subset` here — e.g. call rookAttacksSlow(sq, subset)
+        subsets.push_back(subset);
         subset = (subset - mask) & mask;
     } while (subset != 0ULL);
+    return subsets;
+}
+
+// Ground truth table
+std::vector<AttackTableEntry> buildGroundTruth(int sq, Bitboard mask, PieceType pieceType) {
+    std::vector<AttackTableEntry> table;
+    std::vector<Bitboard> subsets = generateOccupancySubsets(mask);
+
+    if (pieceType == ROOK) {
+        for (Bitboard blockers : subsets) {
+            Bitboard attacks = rookAttacks(sq, blockers);
+            table.push_back({blockers, attacks});
+        }
+    }
+    else if (pieceType == BISHOP) {
+        for (Bitboard blockers : subsets) {
+            Bitboard attacks = bishopAttacks(sq, blockers);
+            table.push_back({blockers, attacks});
+        }
+    }
+    return table;
+}
+
+uint64_t randomU64() {
+    // std::random_device{}() seed;
+    static std::mt19937_64 engine(69);
+    static std::uniform_int_distribution<uint64_t> dist;
+    
+    return dist(engine);
+}
+
+int magicIndex(const MagicEntry& entry, Bitboard blockers) {
+    //index = (blockers * magic) >> (64 - index_bits)
+    int index;
+    // step 1: mask
+    blockers &= entry.mask;
+    // step 2: multiply
+    blockers *= entry.magic;
+    // step 3: shift
+    blockers >>= entry.shift;
+    // return the result, cast to int (or size_t) for use as an index
+    index = static_cast<int>(blockers);
+    return index;
+}
+
+bool tryMakeTable(const std::vector<AttackTableEntry>& groundTruth, const MagicEntry& entry, std::vector<Bitboard>& table) {
+    Bitboard empty = ~Bitboard(0);
+    int indexBits = 64 - entry.shift;
+    table.assign(1 << indexBits, empty);
+
+    // for each entry in groundTruth:
+    for (const auto& gt : groundTruth) {
+        int index = magicIndex(entry, gt.blockers);
+        if (table[index] == empty) {
+            table[index] = gt.attacks;
+        }
+        else if (table[index] != gt.attacks){
+            return false; //Found a collision
+        }
+    }
+    return true; 
+}
+
+MagicEntry findMagic(int sq, Bitboard mask, const std::vector<AttackTableEntry>& groundTruth, int indexBits) {
+    int shift = 64 - indexBits;
+    std::vector<Bitboard> table;
+    while (true) {
+        uint64_t magic = randomU64() & randomU64() & randomU64();
+        MagicEntry magic_entry = MagicEntry{mask, magic, shift};
+        if (tryMakeTable(groundTruth, magic_entry, table)) {
+            return magic_entry;
+        }
+
+    }
 }
