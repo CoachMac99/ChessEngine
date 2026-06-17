@@ -151,3 +151,89 @@ Bitboard bishopRelevantBlockers(int sq) {
     return mask;
 }
 
+Bitboard rookAttacks(int sq, Bitboard blockers) {
+    Bitboard attacks = 0ULL;
+    int rank = sq / 8;
+    int file = sq % 8;
+
+    // up the file
+    for (int r = rank + 1; r <= 7; r++) {
+        int targetSq = r * 8 + file;
+        setBit(attacks, targetSq);
+        if (testBit(blockers, targetSq)) {
+            break; // stop after including the blocker square
+        }
+    }
+
+    // down the file 
+    for (int r = rank - 1; r >= 0; r--) {
+        int targetSq = r * 8 + file;
+        setBit(attacks, targetSq);
+        if (testBit(blockers, targetSq)) {
+            break;
+        }
+    }
+
+    //right along rank 
+    for (int f = file + 1; f <= 7; f++) {
+        int targetSq = rank * 8 + f;
+        setBit(attacks, targetSq);
+        if (testBit(blockers, targetSq)) {
+            break;
+        }
+    }
+
+    //left along rank.
+    for (int f = file - 1; f >= 0; f--) {
+        int targetSq = rank * 8 + f;
+        setBit(attacks, targetSq);
+        if (testBit(blockers, targetSq)) {
+            break;
+        }
+    }
+    return attacks;
+}
+
+Bitboard bishopAttacks(int sq, Bitboard blockers) {
+    Bitboard attacks = 0ULL;
+    int rank = sq / 8;
+    int file = sq % 8;
+
+
+    // down the file, left along rank, right along rank...
+    for (int r = rank + 1, f = file + 1; r <= 7 && f <= 7; r++, f++) {
+        int targetSq = r * 8 + f;
+        setBit(attacks, targetSq);
+        if (testBit(blockers, targetSq)) {
+            break; // stop after including the blocker square
+        }
+    }
+
+    // up-left diagonal: rank increases, file decreases
+    for (int r = rank + 1, f = file - 1; r <= 7 && f >= 0; r++, f--) {
+        int targetSq = r * 8 + f;
+        setBit(attacks, targetSq);
+        if (testBit(blockers, targetSq)) {
+            break;
+        }
+    }
+
+    // down-right diagonal: rank decreases, file increases
+    for (int r = rank - 1, f = file + 1; r >= 0 && f <= 7; r--, f++) {
+        int targetSq = r * 8 + f;
+        setBit(attacks, targetSq);
+        if (testBit(blockers, targetSq)) {
+            break;
+        }
+    }
+
+    // down-left diagonal: rank decreases, file decreases
+    for (int r = rank - 1, f = file - 1; r >= 0 && f >= 0; r--, f--) {
+        int targetSq = r * 8 + f;
+        setBit(attacks, targetSq);
+        if (testBit(blockers, targetSq)) {
+            break;
+        }
+    }
+    return attacks;
+}
