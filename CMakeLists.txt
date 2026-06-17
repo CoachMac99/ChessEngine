@@ -10,7 +10,8 @@ find_package(OpenGL REQUIRED)
 add_executable(chess
     src/main.cpp
     src/visualization.cpp
-    src/bitboard.cpp
+    src/board/bitboard.cpp
+    src/moveGeneration/movegen.cpp
 )
 
 target_link_libraries(chess PRIVATE

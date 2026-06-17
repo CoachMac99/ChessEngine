@@ -5,8 +5,10 @@
 int visualizationMain();  // forward declare
 
 int main() {
-    initAttackTables();
-    printBitboard(whitePawnAttacks[20]);
+    //initAttackTables();
+    //printBitboard(whitePawnAttacks[20]);
+
+    visualizationMain();
 
     return 0;
 }
